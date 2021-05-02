@@ -15,6 +15,12 @@ public static int PLAYING_MOVIE2 = 5;
 public static int PLAYING_MOVIE3 = 6;
 public static int STOP_CHANGE_COLOR = 7;
 
+int ProgramStatus = 0;
+public static int VIDEOCHOOSEN = 0;
+public static int VIDEO1_PLAYING = 1;
+public static int VIDEO2_PLAYING = 1;
+public static int VIDEO3_PLAYING = 1;
+
 String ServerIP = "127.0.0.1";
 int ServerPort = 10002;
 int dataIn = 0;
@@ -98,13 +104,70 @@ void setup() {
   //myClient.write(STOP_PLAYING);
   frameRate(60);
 }
+void drawRebuile() {
+  //judge trigger status
+  for (Hand hand : leap.getHands ()) {
+    if (hand == null)break;
+    //If there is no hand
+    if (HandShapIsOK(hand))HandShapPlay = 1;
+    //check if handshape Play
+    if (HandShapIsFive(hand))HandShapBack = 1;
+  }
+  //Handle Signals
+  if (SomeThingNeedToSend) {
+    SomeThingNeedToSend = false;
+    myClient.clear();
+    myClient.write(CommandCode);
+    //handle any Command Send task
+  }
+  if (HandShapBack==1)HandleReturnButton();
+  //if handShap "Return" is detected, Handle it
+  if (mouseButton == CENTER)exit();
+  switch(ProgramStatus) {
+  case 0:
+    {
+      SceneVideoChoose();
+      break;
+    }
+  case 1:
+    {
+      //playing video1
+      image(Movie1, width/2, height/2, width, height);
+      for (Hand hand : leap.getHands ()) {
+        if (HandShapIsStone(hand)) {
+          CommandCode = CHANGE_COLOR;
+          SomeThingNeedToSend = true;
+        }
+        break;
+      }
+    }
+  case 2:
+    {
+      //playing video2
+      image(Movie2, width/2, height/2, width, height);
+      if (HandShapIsSword(hand)) {
+        CommandCode = CHANGE_COLOR;
+        SomeThingNeedToSend = true;
+      }
+    }
+  case 3:
+    {
+      //playing video3
+      image(Movie3, width/2, height/2, width, height);
+      if (HandShapIsBye(hand)) {
+        CommandCode = CHANGE_COLOR;
+        SomeThingNeedToSend = true;
+      }
+    }
+  }
+}
 
 void draw() {
   /*if (myClient.available() > 0) {
    dataIn = myClient.read(); 
    //read any data from Server.
    }*/
-  
+
   if (SomeThingNeedToSend) {
     SomeThingNeedToSend = false;
     myClient.clear();
@@ -116,7 +179,7 @@ void draw() {
   //image(BackGround1, 0, 0, width, height);
   //image(BackGround1, 0, 0);
   for (Hand hand : leap.getHands ()) {
-    if(hand == null)break;
+    if (hand == null)break;
     //If there is no hand
     if (HandShapIsOK(hand))HandShapPlay = 1;
     //check if handshape Play
