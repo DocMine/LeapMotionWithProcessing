@@ -3,10 +3,19 @@ import processing.video.*;
 import processing.net.*;
 import de.voidplus.leapmotion.*;
 //leap Motion
+//import every lib we need
+
 LeapMotion leap;
+//Init leapMotion
+HandXLocationMin = 0;
+HandXLocationMax = 1200;
+int ProgramStatus = 0;
+public static int VIDEOCHOOSEN = 0;
+public static int VIDEO1_PLAYING = 1;
+public static int VIDEO2_PLAYING = 2;
+public static int VIDEO3_PLAYING = 3;
+//Identify ProgramStatus List
 
-
-//Identify CommandCode List
 public static int PLAY_SCENE = 1;
 public static int STOP_PLAYING = 2;
 public static int CHANGE_COLOR = 3;
@@ -14,12 +23,8 @@ public static int PLAYING_MOVIE1 = 4;
 public static int PLAYING_MOVIE2 = 5;
 public static int PLAYING_MOVIE3 = 6;
 public static int STOP_CHANGE_COLOR = 7;
+//Identify CommandCode List
 
-int ProgramStatus = 0;
-public static int VIDEOCHOOSEN = 0;
-public static int VIDEO1_PLAYING = 1;
-public static int VIDEO2_PLAYING = 1;
-public static int VIDEO3_PLAYING = 1;
 
 String ServerIP = "127.0.0.1";
 int ServerPort = 10002;
@@ -36,27 +41,7 @@ Movie Movie1, Movie2, Movie3;
 Movie BackGround1, BackGround2;
 // Declare 2 variable of type PImage for Backgroud
 
-int FrontCoverMinWidth = 0;
-int FrontCoverMinHight = 0;
-int FrontCoverMaxWidth = 0;
-int FrontCoverMaxHight = 0;
-
-int FrontCover1Width = 0;
-int FrontCover1Hight = 0;
-int FrontCover2Width = 0;
-int FrontCover2Hight = 0;
-int FrontCover3Width = 0;
-int FrontCover3Hight = 0;
-
-int FrontCover1X = 0;
-int FrontCover1Y = 0;
-int FrontCover2X = 0;
-int FrontCover2Y = 0;
-int FrontCover3X = 0;
-int FrontCover3Y = 0;
-
-int LRedge = 0;
-
+int LRedge = 20/width;
 int HandShapPlay = 0;
 int HandShapBack = 0;
 int Is_Playing = 0;
@@ -72,7 +57,6 @@ void setup() {
   //nothing will be drawn to the screen.
   BackGround1 = new Movie(this, sketchPath("")+"Background1.mov");
   BackGround1.loop();
-
   FrontCover1 = loadImage(sketchPath("")+"Cover1.jpg");
   FrontCover2 = loadImage(sketchPath("")+"Cover2.jpg");  
   FrontCover3 = loadImage(sketchPath("")+"Cover3.jpg");  
@@ -104,13 +88,15 @@ void setup() {
   //myClient.write(STOP_PLAYING);
   frameRate(60);
 }
+
 void drawRebuile() {
   //judge trigger status
   for (Hand hand : leap.getHands ()) {
     if (hand == null)break;
     //If there is no hand
     if (HandShapIsOK(hand))HandShapPlay = 1;
-    //check if handshape Play
+    //check if handshape Play,when handshap is Play
+    //founction VideoChoose will make it play
     if (HandShapIsFive(hand))HandShapBack = 1;
   }
   //Handle Signals
@@ -127,6 +113,7 @@ void drawRebuile() {
   case 0:
     {
       SceneVideoChoose();
+      //fresh the choose scene and check handshap
       break;
     }
   case 1:
@@ -138,36 +125,38 @@ void drawRebuile() {
           CommandCode = CHANGE_COLOR;
           SomeThingNeedToSend = true;
         }
-        break;
       }
+      break;
     }
   case 2:
     {
       //playing video2
       image(Movie2, width/2, height/2, width, height);
+      for (Hand hand : leap.getHands()){
       if (HandShapIsSword(hand)) {
         CommandCode = CHANGE_COLOR;
         SomeThingNeedToSend = true;
       }
+      }
+      break;
     }
   case 3:
     {
       //playing video3
       image(Movie3, width/2, height/2, width, height);
+      for (Hand hand : leap.getHands()){
       if (HandShapIsBye(hand)) {
         CommandCode = CHANGE_COLOR;
         SomeThingNeedToSend = true;
       }
+      }
+      break;
     }
   }
 }
 
 void draw() {
-  /*if (myClient.available() > 0) {
-   dataIn = myClient.read(); 
-   //read any data from Server.
-   }*/
-
+  
   if (SomeThingNeedToSend) {
     SomeThingNeedToSend = false;
     myClient.clear();
@@ -222,7 +211,26 @@ void movieEvent(Movie m) {
 }
 
 void SceneVideoChoose() {
-  imageMode(CORNER);
+  int FrontCoverMinWidth = 0;
+  int FrontCoverMinHight = 0;
+  int FrontCoverMaxWidth = 0;
+  int FrontCoverMaxHight = 0;
+  
+  int FrontCover1Width = 0;
+  int FrontCover1Hight = 0;
+  int FrontCover2Width = 0;
+  int FrontCover2Hight = 0;
+  int FrontCover3Width = 0;
+  int FrontCover3Hight = 0;
+  
+  int FrontCover1X = 0;
+  int FrontCover1Y = 0;
+  int FrontCover2X = 0;
+  int FrontCover2Y = 0;
+  int FrontCover3X = 0;
+  int FrontCover3Y = 0;
+  
+  imageMode(CENTER);
   FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
   FrontCover1Hight = FrontCover1Width*FrontCover1.height/FrontCover1.width;
   FrontCover2Width = int(map(width-abs(width/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
@@ -231,12 +239,12 @@ void SceneVideoChoose() {
   FrontCover3Hight = FrontCover3Width*FrontCover3.height/FrontCover3.width;
   //Frash Img size
 
-  FrontCover1X = LRedge;
-  FrontCover1Y = height/2-FrontCover1Hight/2;
-  FrontCover2X = width/2-FrontCover2Width/2;
-  FrontCover2Y = height/2-FrontCover2Hight/2;
-  FrontCover3X = width-FrontCover3Width-LRedge;
-  FrontCover3Y = height/2-FrontCover3Hight/2;
+  FrontCover1X = LRedge+FrontCover1X/2;
+  FrontCover1Y = height/2;
+  FrontCover2X = width/2;
+  FrontCover2Y = height/2;
+  FrontCover3X = width - LRedge - FrontCover3X;
+  FrontCover3Y = height/2;
   //Frash Img Location
 
   //get mouse location
@@ -277,6 +285,7 @@ void VidoeChooseToPlay() {
     myClient.write(PLAY_SCENE);
     Movie1.play();
     Is_Playing = 1;
+    ProgramStatus = 1;
     //play movie1
   } else if (GetHandX()>FrontCover2X && GetHandX()<FrontCover2X+FrontCover2Width) {
     myClient.clear();
@@ -284,6 +293,7 @@ void VidoeChooseToPlay() {
     myClient.write(PLAY_SCENE);
     Movie2.play();
     Is_Playing = 2;
+    ProgramStatus = 2;
     //play movie2
   } else if (GetHandX()>FrontCover3X && GetHandX()<FrontCover3X+FrontCover3Width) {
     myClient.clear();
@@ -291,29 +301,26 @@ void VidoeChooseToPlay() {
     myClient.write(PLAY_SCENE);
     Movie3.play();
     Is_Playing = 3;
+    ProgramStatus = 3;
     //play movie3
   }
 }
 
 void HandleReturnButton() {
-  BackGround1.pause();
+  HandShapBack = 0;
   Movie1.stop();
   Movie2.stop();
   Movie3.stop();
   Is_Playing = 0;
-  HandShapBack = 0;
+  ProgramStatus = 0;
   myClient.write(STOP_PLAYING);
 }
 
 int GetHandX() {
-  int HandX=0;
   PVector handPosition;
-  for (Hand hand : leap.getHands ()) {
-    handPosition = hand.getPosition();
-    HandX = int(map(handPosition.x, -200, 1700, 0, width));
-    println(handPosition);
-  }
-  return HandX;
+  hand=leap.getHands();
+  handPosition = hand.getPosition();
+  return int(map(handPosition.x, HandXLocationMin, HandXLocationMax, 0, width));
 }
 
 boolean HandShapIsOK(Hand hand) {
@@ -322,9 +329,6 @@ boolean HandShapIsOK(Hand hand) {
   Finger  fingerMiddle       = hand.getMiddleFinger();
   Finger  fingerRing         = hand.getRingFinger();
   Finger  fingerPink         = hand.getPinkyFinger();
-
-
-  //println(DisBetweenFingers(RingStabilized, handPosition));
 
   if (!fingerIndex.isExtended()) {
     if (fingerMiddle.isExtended() && fingerRing.isExtended() && fingerPink.isExtended()) {
