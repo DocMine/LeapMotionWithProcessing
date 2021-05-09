@@ -211,24 +211,24 @@ void movieEvent(Movie m) {
 }
 
 void SceneVideoChoose() {
-  int FrontCoverMinWidth = 0;
-  int FrontCoverMinHight = 0;
-  int FrontCoverMaxWidth = 0;
-  int FrontCoverMaxHight = 0;
+  public int FrontCoverMinWidth = 0;
+  public int FrontCoverMinHight = 0;
+  public int FrontCoverMaxWidth = 0;
+  public int FrontCoverMaxHight = 0;
   
-  int FrontCover1Width = 0;
-  int FrontCover1Hight = 0;
-  int FrontCover2Width = 0;
-  int FrontCover2Hight = 0;
-  int FrontCover3Width = 0;
-  int FrontCover3Hight = 0;
+  public int FrontCover1Width = 0;
+  public int FrontCover1Hight = 0;
+  public int FrontCover2Width = 0;
+  public int FrontCover2Hight = 0;
+  public int FrontCover3Width = 0;
+  public int FrontCover3Hight = 0;
   
-  int FrontCover1X = 0;
-  int FrontCover1Y = 0;
-  int FrontCover2X = 0;
-  int FrontCover2Y = 0;
-  int FrontCover3X = 0;
-  int FrontCover3Y = 0;
+  public int FrontCover1X = 0;
+  public int FrontCover1Y = 0;
+  public int FrontCover2X = 0;
+  public int FrontCover2Y = 0;
+  public int FrontCover3X = 0;
+  public int FrontCover3Y = 0;
   
   imageMode(CENTER);
   FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));

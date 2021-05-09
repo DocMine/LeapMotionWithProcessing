@@ -24,7 +24,7 @@ Movie Movie2 = new Movie(this, sketchPath("")+"/Movie2.mov");
 Movie Movie3 = new Movie(this, sketchPath("")+"/Movie3.mov"); 
 //three Movie we need
 
-int programStatue = 0;
+public int ProgramStatus = 0;
 public static int VideoChooseScene = 0; 
 public static int Video_1_PlayScene = 1; 
 public static int Video_2_PlayScene = 2; 
@@ -68,21 +68,21 @@ void draw(){
     //无论如何都会刷新背景
     BackGroundScene();
     //这里检测控制信号，判断程序是否应该退出
-    ControlCmdCheck();
+    if (ControlCmdCheck() == HandShapBack)ProgramStatus = VideoChooseScene;
     //一下代码制定了程序可能出现的7种情况，根据操作检测环节的返回值来确定该如何刷新界面
-    if(programStatue == VideoChooseScene){
+    if(ProgramStatus == VideoChooseScene){
         VideoChooseScene();
-    }else if(programStatue == Video_1_PlayScene){
+    }else if(ProgramStatus == Video_1_PlayScene){
         Video_1_PlayScene();
-    }else if(programStatue == Video_2_PlayScene){
+    }else if(ProgramStatus == Video_2_PlayScene){
         Video_2_PlayScene();
-    }else if(programStatue == Video_3_PlayScene){
+    }else if(ProgramStatus == Video_3_PlayScene){
         Video_3_PlayScene();
-    }else if(programStatue == Video_1_ColorChangeScene){
+    }else if(ProgramStatus == Video_1_ColorChangeScene){
         Video_1_ColorChangeScene();
-    }else if(programStatue == Video_2_ColorChangeScene){
+    }else if(ProgramStatus == Video_2_ColorChangeScene){
         Video_2_ColorChangeScene();
-    }else if(programStatue == Video_3_ColorChangeScene){
+    }else if(ProgramStatus == Video_3_ColorChangeScene){
         Video_3_ColorChangeScene();
     }
 }
@@ -126,44 +126,43 @@ int ControlCmdCheck(){
 }
 
 void VideoChooseScene(){
+    Movie1.stop();
+    Movie2.stop();
+    Movie3.stop();
     //发送循环屏幕指令和封面信息供客户端播放
-    int HandX = 0;//检测手的位置
+    int HandX = GetHandX();//检测手的位置
       //Play Movie1 or Movie2 or Movie3
-    if (GetHandX()>FrontCover1X && GetHandX()<FrontCover1X+FrontCover1Width) {
-        myClient.clear();
-        myClient.write(PLAYING_MOVIE1);
-        myClient.write(PLAY_SCENE);
-        Movie1.play();
-        Is_Playing = 1;
-        ProgramStatus = 1;
-        //play movie1
-    } else if (GetHandX()>FrontCover2X && GetHandX()<FrontCover2X+FrontCover2Width) {
-        myClient.clear();
-        myClient.write(PLAYING_MOVIE2);
-        myClient.write(PLAY_SCENE);
-        Movie2.play();
-        Is_Playing = 2;
-        ProgramStatus = 2;
-        //play movie2
-    } else if (GetHandX()>FrontCover3X && GetHandX()<FrontCover3X+FrontCover3Width) {
-        myClient.clear();
-        myClient.write(PLAYING_MOVIE3);
-        myClient.write(PLAY_SCENE);
-        Movie3.play();
-        Is_Playing = 3;
-        ProgramStatus = 3;
-        //play movie3
+    if (ControlCmdCheck() == HandShapOK){//如果用户选择播放
+        if (HandX > FrontCover1X && HandX < FrontCover1X+FrontCover1Width) {
+            CommandSend(Command_Video_1_Play);
+            Movie1.play();
+            ProgramStatus = Video_1_PlayScene;
+            //play movie1
+            return;
+        } else if ( HandX > FrontCover2X && HandX <FrontCover2X+FrontCover2Width) {
+            CommandSend(Command_Video_2_Play);
+            Movie2.play();
+            ProgramStatus = Video_2_PlayScene;
+            //play movie2
+            return;
+        } else if ( HandX > FrontCover3X && HandX <FrontCover3X+FrontCover3Width) {
+            CommandSend(Command_Video_3_Play);
+            Movie3.play();
+            ProgramStatus = Video_3_PlayScene;
+            //play movie3
+            return;
+        }
     }
     //这里循环刷新和显示视频选择界面
     int FrontCoverMinWidth = width / 8;
     int FrontCoverMinHight = height / 10;
     int FrontCoverMaxWidth = width / 3;
     int FrontCoverMaxHight = height / 2;
-    int FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
     int FrontCover1Hight = FrontCover1Width*FrontCover1.height/FrontCover1.width;
-    int FrontCover2Width = int(map(width-abs(width/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover2Width = int(map(width-abs(width/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
     int FrontCover2Hight = FrontCover2Width*FrontCover2.height/FrontCover2.width;
-    int FrontCover3Width = int(map(width-abs(FrontCover3X+FrontCoverMaxWidth/2-GetHandX()), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover3Width = int(map(width-abs(FrontCover3X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
     int FrontCover3Hight = FrontCover3Width*FrontCover3.height/FrontCover3.width;
     //Frash Img size
     int FrontCover1X = LRedge+FrontCover1X/2;
@@ -180,48 +179,51 @@ void VideoChooseScene(){
     image(FrontCover2, FrontCover2X, FrontCover2Y, FrontCover2Width, FrontCover2Hight);
     image(FrontCover3, FrontCover3X, FrontCover3Y, FrontCover3Width, FrontCover3Hight);
     // Displays the image at point (0, height/2) at half of its size
-    if (GetHandX()>FrontCover1X && GetHandX()<FrontCover1X+FrontCover1Width) {
-        if (CommandCode != PLAYING_MOVIE1) {
-        SomeThingNeedToSend = true;
-        CommandCode = PLAYING_MOVIE1;
-        }
-    } else if (GetHandX()>FrontCover2X && GetHandX()<FrontCover2X+FrontCover2Width) {
-        if (CommandCode != PLAYING_MOVIE2) {
-        SomeThingNeedToSend = true;
-        CommandCode = PLAYING_MOVIE2;
-        }
-    } else if (GetHandX()>FrontCover3X && GetHandX()<FrontCover3X+FrontCover3Width) {
-        if (CommandCode != PLAYING_MOVIE3) {
-        SomeThingNeedToSend = true;
-        CommandCode = PLAYING_MOVIE3;
-        }
-    }
-    //Notice Screen2 to Show Cover
-    if (HandShapPlay!=0) {
-        //Check If hand shap is "Play"
-        HandShapPlay = 0;
-        VidoeChooseToPlay();
-        //set Is_Playing to 1/2/3 judged by mouse location
+    // 发送封面序号到服务器，驱动显示屏2显示对应画面
+    if (HandX > FrontCover1X && HandX < FrontCover1X+FrontCover1Width) {
+        CommandSend(Command_Video_1_Cover);
+    } else if ( HandX > FrontCover2X && HandX <FrontCover2X+FrontCover2Width) {
+        CommandSend(Command_Video_2_Cover);
+    } else if ( HandX > FrontCover3X && HandX <FrontCover3X+FrontCover3Width) {
+        CommandSend(Command_Video_3_Cover);
     }
 }
 
 void Video_1_PlayScene(){
     CommandSend(Command_Video_1_Play);
+    //image(Movie1, width/2, height/2, width, height);
+    image(Movie1, width/2, height/2);//无缩放居中播放
+    ProgramStatus = Video_1_PlayScene;
+    if(ControlCmdCheck() == HandShapStone){
+        ProgramStatus = Video_1_ColorChangeScene;
+    }
     //播放视频1
 }
 
 void Video_2_PlayScene(){
     CommandSend(Command_Video_2_Play);
+    //image(Movie2, width/2, height/2, width, height);
+    image(Movie2, width/2, height/2);//无缩放居中播放
+    ProgramStatus = Video_2_PlayScene;
+    if(ControlCmdCheck() == HandShapStone){
+        ProgramStatus = Video_2_ColorChangeScene;
+    }
     //播放视频2
 }
 
 void Video_3_PlayScene(){
     CommandSend(Command_Video_2_Play);
+    //image(Movie3, width/2, height/2, width, height);
+    image(Movie3, width/2, height/2);//无缩放居中播放
+    ProgramStatus = Video_3_PlayScene;
+    if(ControlCmdCheck() == HandShapStone){
+        ProgramStatus = Video_3_ColorChangeScene;
+    }
     //播放视频3
 }
 
 void Video_1_ColorChangeScene(){
-    CommandSend(Command_Video_1_ChangeColor);
+     CommandSend(Command_Video_1_ChangeColor);
      Video_1_PlayScene();
      //后面写发送信息要求客户端播放视频1换色指令
 }
@@ -247,4 +249,12 @@ void CommandSend(int CommandStateMant){
 void movieEvent(Movie m) {
     m.read();
     //用不断显示图片的方法播放视频
+  }
+
+  GetHandX(){
+    //检测手的位置
+    PVector handPosition;
+    Hand hand=leap.getHands();
+    handPosition = hand.getPosition();
+    return int(map(handPosition.x, HandXLocationMin, HandXLocationMax, 0, width));
   }
