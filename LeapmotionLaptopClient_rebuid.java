@@ -131,7 +131,26 @@ void VideoChooseScene(){
     Movie3.stop();
     //发送循环屏幕指令和封面信息供客户端播放
     int HandX = GetHandX();//检测手的位置
-      //Play Movie1 or Movie2 or Movie3
+    //这里循环刷新和显示视频选择界面
+    //Frash Img size
+    int FrontCoverMinWidth = width / 8;
+    int FrontCoverMinHight = height / 10;
+    int FrontCoverMaxWidth = width / 3;
+    int FrontCoverMaxHight = height / 2;
+    int FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover1Hight = FrontCover1Width*FrontCover1.height/FrontCover1.width;
+    int FrontCover2Width = int(map(width-abs(width/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover2Hight = FrontCover2Width*FrontCover2.height/FrontCover2.width;
+    int FrontCover3Width = int(map(width-abs(FrontCover3X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
+    int FrontCover3Hight = FrontCover3Width*FrontCover3.height/FrontCover3.width;
+    //Frash Img Location
+    int FrontCover1X = LRedge+FrontCover1X/2;
+    int FrontCover1Y = height/2;
+    int FrontCover2X = width/2;
+    int FrontCover2Y = height/2;
+    int FrontCover3X = width - LRedge - FrontCover3X;
+    int FrontCover3Y = height/2;
+    //Play Movie1 or Movie2 or Movie3
     if (ControlCmdCheck() == HandShapOK){//如果用户选择播放
         if (HandX > FrontCover1X && HandX < FrontCover1X+FrontCover1Width) {
             CommandSend(Command_Video_1_Play);
@@ -153,26 +172,6 @@ void VideoChooseScene(){
             return;
         }
     }
-    //这里循环刷新和显示视频选择界面
-    int FrontCoverMinWidth = width / 8;
-    int FrontCoverMinHight = height / 10;
-    int FrontCoverMaxWidth = width / 3;
-    int FrontCoverMaxHight = height / 2;
-    int FrontCover1Width = int(map(width-abs(FrontCover1X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
-    int FrontCover1Hight = FrontCover1Width*FrontCover1.height/FrontCover1.width;
-    int FrontCover2Width = int(map(width-abs(width/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
-    int FrontCover2Hight = FrontCover2Width*FrontCover2.height/FrontCover2.width;
-    int FrontCover3Width = int(map(width-abs(FrontCover3X+FrontCoverMaxWidth/2-HandX), 0, width, FrontCoverMinWidth, FrontCoverMaxWidth));
-    int FrontCover3Hight = FrontCover3Width*FrontCover3.height/FrontCover3.width;
-    //Frash Img size
-    int FrontCover1X = LRedge+FrontCover1X/2;
-    int FrontCover1Y = height/2;
-    int FrontCover2X = width/2;
-    int FrontCover2Y = height/2;
-    int FrontCover3X = width - LRedge - FrontCover3X;
-    int FrontCover3Y = height/2;
-    //Frash Img Location
-
     imageMode(CENTER);
     //get mouse location
     image(FrontCover1, FrontCover1X, FrontCover1Y, FrontCover1Width, FrontCover1Hight);
@@ -251,7 +250,7 @@ void movieEvent(Movie m) {
     //用不断显示图片的方法播放视频
   }
 
-  GetHandX(){
+int GetHandX(){
     //检测手的位置
     PVector handPosition;
     Hand hand=leap.getHands();
