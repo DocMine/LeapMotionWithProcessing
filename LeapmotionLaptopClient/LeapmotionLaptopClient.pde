@@ -10,7 +10,7 @@ LeapMotion leap;
 
 String ServerIP = "127.0.0.1";
 int ServerPort = 10002;
-//Client myClient = new Client(this, ServerIP, ServerPort);;
+Client myClient = new Client(this, ServerIP, ServerPort);
 //Init Socket services
 
 
@@ -58,9 +58,9 @@ void setup() {
   Movie3 = new Movie(this, sketchPath("")+"/Movie3.mov"); 
   //three Movie we need
   leap = new LeapMotion(this);
-  //size(1280, 960);
+  size(1280, 960);
   //set Window Size
-  fullScreen();
+  //fullScreen();
   noStroke();
   //Disables drawing the stroke (outline). 
   //If both noStroke() and noFill() are called, 
@@ -261,8 +261,8 @@ void Video_3_ColorChangeScene() {
 }
 
 void CommandSend(int CommandStateMant) {
-  //myClient.clear();
-  //myClient.write(CommandStateMant);
+  myClient.clear();
+  myClient.write(CommandStateMant);
   println("Net sent: ", CommandStateMant);
   //向客户端发送相应指令
 }

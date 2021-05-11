@@ -1,6 +1,10 @@
 import processing.net.*;
 import processing.video.*;
 
+String ServerIP = "127.0.0.1";
+int ServerPort = 10002;
+Server myServer;
+
 //Identify CommandCode List
 public static int PLAY_SCENE = 1;
 public static int STOP_PLAYING = 2;
@@ -10,114 +14,134 @@ public static int PLAYING_MOVIE2 = 5;
 public static int PLAYING_MOVIE3 = 6;
 public static int STOP_CHANGE_COLOR = 7;
 
+public static int Command_Video_1_Cover = 1;
+public static int Command_Video_2_Cover = 2;
+public static int Command_Video_3_Cover = 3;
+public static int Command_Video_1_Play = 4;
+public static int Command_Video_2_Play = 5;
+public static int Command_Video_3_Play = 6;
+public static int Command_Video_1_ChangeColor = 7;
+public static int Command_Video_2_ChangeColor = 8;
+public static int Command_Video_3_ChangeColor = 9;
+
 PImage FrontCover1, FrontCover2, FrontCover3;  
 // Declare 3 variable of type PImage
 Movie MovieShap1, MovieShap2, MovieShap3;
 //three Movie we need
 
 int CommandReceived = 0;
-int port = 10002;
 boolean myServerRunning = true;
 int MovieBeenPointed = 0;
 int Is_Playing = 0;
 boolean ColorChenge = false;
-Server myServer;
+
 
 void setup() {
   imageMode(CENTER);
-  myServer = new Server(this, port);
+  myServer = new Server(this, ServerPort);
   // Starts a myServer on port 10002
   size(640, 480);
   //set Window Size
   //fullScreen();
   noStroke();
-  //  Disables drawing the stroke (outline). 
-  //If both noStroke() and noFill() are called, 
-  //nothing will be drawn to the screen.
-
+  //所绘制的图形都没有描边
+  //加载图像和视频并准备
   FrontCover1 = loadImage(sketchPath("")+"ShapeCover1.jpg");
   FrontCover2 = loadImage(sketchPath("")+"ShapeCover2.jpg");  
   FrontCover3 = loadImage(sketchPath("")+"ShapeCover3.jpg");  
-  // Load the image into the program
-  // The image file must be in the data folder of the current sketch to load successfully
   MovieShap1 = new Movie(this, sketchPath("")+"/MovieShap1.mov");
   MovieShap2 = new Movie(this, sketchPath("")+"/MovieShap2.mov");
   MovieShap3 = new Movie(this, sketchPath("")+"/MovieShap3.mov");
-  //load videos
+  //SetPlayMode
   MovieShap1.loop();
   MovieShap2.loop();
   MovieShap3.loop();
   MovieShap1.pause();
   MovieShap2.pause();
   MovieShap3.pause();
-  //SetPlayMode
   textSize(30);
-  frameRate(60);
+  text("server", 500, 45);
+  //frameRate(60);
 }
 
 void draw() {
-  if (mouseButton == CENTER) {
-    myServer.stop();
-    myServerRunning = false;
+  if (mousePressed) {
+    if (mouseButton == CENTER) {
+      myServer.stop();
+      myServerRunning = false;
+      exit();
+    }
   }
+  //退出机制
   //image(MovieShap3, width/2, height/2, width, height);
-  if (myServerRunning == true)
-  {
-    text("server", 500, 45);
     Client thisClient = myServer.available();
+    //获取链接进来的client
+    if(thisClient != null)println("got");
     if (thisClient != null && thisClient.available() > 0) {
       CommandReceived= thisClient.read();
+      println("received: ", CommandReceived);
     }
-    switch(CommandReceived) {
-      case (4):
-      {
-        //PLAYING_MOVIE1
-        MovieBeenPointed=PLAYING_MOVIE1;
-        break;
-      }
-      case (5):
-      {
-        //PLAYING_MOVIE2
-        MovieBeenPointed=PLAYING_MOVIE2;
-        break;
-      }
-      case (6):
-      {
-        //PLAYING_MOVIE3
-        MovieBeenPointed=PLAYING_MOVIE3;
-        break;
-      }
-      case (7):
-      {
-        //STOP_CHANGE_COLOR
-        ColorChenge = false;
-        break;
-      }
-      case (1):
-      {
-        //PLAY_SCENE
-        text("PlayChoosenMovie", 15, 80);
-        PlayChoosenMovie();
-        break;
-      }
-      case (2):
-      {
-        //STOP_PLAYING
-        HandleReturnButton();
-        break;
-      }
-      case (3):
-      {
-        //CHANGE COLOR
-        ColorChenge = true;
-        break;
-      }
+    //获取读取到的数据 
+      if (thisClient != null && thisClient.available() > 0) {
+      CommandReceived= thisClient.read();
     }
-
-    SceneMoviePlay();
-    //SceneMoviePlay will check witch movie was choosen automaticlly
-    //and play it :)
+    //对于每个连入的客户端，获取读取到的数据
+    if (CommandReceived == Command_Video_1_Cover) {
+    Video_1_Cover();
+  } else if (CommandReceived == Command_Video_2_Cover) {
+    Video_2_Cover();
+  } else if (CommandReceived == Command_Video_3_Cover) {
+    Video_3_Cover();
+  } else if (CommandReceived == Command_Video_1_Play) {
+    Video_1_Play();
+  } else if (CommandReceived == Command_Video_2_Play) {
+    Video_2_Play();
+  } else if (CommandReceived == Command_Video_3_Play) {
+    Video_3_Play();
+  } else if (CommandReceived == Command_Video_1_ChangeColor) {
+    Video_1_ColorChangeScene();
+  } else if (CommandReceived == Command_Video_2_ChangeColor) {
+    Video_2_ColorChangeScene();
+  } else if (CommandReceived == Command_Video_3_ChangeColor) {
+    Video_3_ColorChangeScene();
   }
+}
+
+void Video_1_Cover(){
+  //封面1
+  set(0, 0, FrontCover1);
+}
+void Video_2_Cover(){
+  //封面2
+  set(0, 0, FrontCover2);
+}
+void Video_3_Cover(){
+  //封面3
+  set(0, 0, FrontCover3);
+}
+void Video_1_Play(){
+  //播放视频1
+  image(MovieShap1, width/2, height/2, width, height);
+}
+void Video_2_Play(){
+  //播放视频2
+  image(MovieShap2, width/2, height/2, width, height);
+}
+void Video_3_Play(){
+  //播放视频3
+  image(MovieShap3, width/2, height/2, width, height);
+}
+void Video_1_ColorChangeScene(){
+  ColorChange(MovieShap1, color(0, 0, 0), color(255, 0, 0), 50);
+  //播放处理过的视频1(白色替换为蓝色)
+}
+void Video_2_ColorChangeScene(){
+  ColorChange(MovieShap2, color(0, 0, 0), color(0, 255, 0), 50);
+  //播放处理过的视频2(白色替换为红色)
+}
+void Video_3_ColorChangeScene(){
+  ColorChange(MovieShap3, color(0, 0, 0), color(0, 0, 255), 50);
+  //播放处理过的视频3(白色替换为绿色)
 }
 
 void PlayChoosenMovie() {
@@ -180,6 +204,7 @@ void SceneMoviePlay() {
 }
 
 void ColorChange(PImage img, color Incolor, color Outcolor, int dif) {
+  //输入图片开始颜色替换，替换完成的图片从0，0平铺在屏幕上
   int mx, my;
   int r, g, b, IncolorR, IncolorG, IncolorB;
   color SelectedPixColor;
