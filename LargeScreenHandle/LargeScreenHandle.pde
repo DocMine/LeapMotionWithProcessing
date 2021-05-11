@@ -29,7 +29,7 @@ PImage FrontCover1, FrontCover2, FrontCover3;
 Movie MovieShap1, MovieShap2, MovieShap3;
 //three Movie we need
 
-int CommandReceived = 8;
+int CommandReceived = 0;
 boolean myServerRunning = true;
 int MovieBeenPointed = 0;
 int Is_Playing = 0;
