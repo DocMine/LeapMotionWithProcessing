@@ -8,7 +8,8 @@ import de.voidplus.leapmotion.*;
 LeapMotion leap;
 //Init leapMotion Device
 
-String ServerIP = "127.0.0.1";
+//String ServerIP = "127.0.0.1";
+String ServerIP = "192.168.10.105";
 int ServerPort = 10002;
 Client myClient = new Client(this, ServerIP, ServerPort);
 //Init Socket services
@@ -16,14 +17,8 @@ Client myClient = new Client(this, ServerIP, ServerPort);
 
 
 public int ProgramStatus = 0;
-public static int VideoChooseScene = 0; 
-public static int Video_1_PlayScene = 1; 
-public static int Video_2_PlayScene = 2; 
-public static int Video_3_PlayScene = 3; 
-public static int Video_1_ColorChangeScene = 4; 
-public static int Video_2_ColorChangeScene = 5; 
-public static int Video_3_ColorChangeScene = 6; 
 
+public static int Command_VideoChooseScene = 0;
 public static int Command_Video_1_Cover = 1;
 public static int Command_Video_2_Cover = 2;
 public static int Command_Video_3_Cover = 3;
@@ -78,23 +73,23 @@ void draw() {
   //无论如何都会刷新背景
   BackGroundScene();
   //这里检测控制信号，判断程序是否应该退出
-  if (ControlCmdCheck() == HandShapBack)ProgramStatus = VideoChooseScene;
-  if (ControlCmdCheck() == HandShapBack)ProgramStatus = VideoChooseScene;
+  if (ControlCmdCheck() == HandShapBack)ProgramStatus = Command_VideoChooseScene;
+  if (ControlCmdCheck() == HandShapBack)ProgramStatus = Command_VideoChooseScene;
   //一下代码制定了程序可能出现的7种情况，根据操作检测环节的返回值来确定该如何刷新界面
-  if (ProgramStatus == VideoChooseScene) {
+  if (ProgramStatus == Command_VideoChooseScene) {
     VideoChooseScene();
-  } else if (ProgramStatus == Video_1_PlayScene) {
-    Video_1_PlayScene();
-  } else if (ProgramStatus == Video_2_PlayScene) {
-    Video_2_PlayScene();
-  } else if (ProgramStatus == Video_3_PlayScene) {
-    Video_3_PlayScene();
-  } else if (ProgramStatus == Video_1_ColorChangeScene) {
-    Video_1_ColorChangeScene();
-  } else if (ProgramStatus == Video_2_ColorChangeScene) {
-    Video_2_ColorChangeScene();
-  } else if (ProgramStatus == Video_3_ColorChangeScene) {
-    Video_3_ColorChangeScene();
+  } else if (ProgramStatus == Command_Video_1_Play) {
+    Command_Video_1_Play();
+  } else if (ProgramStatus == Command_Video_2_Play) {
+    Command_Video_2_Play();
+  } else if (ProgramStatus == Command_Video_3_Play) {
+    Command_Video_3_Play();
+  } else if (ProgramStatus == Command_Video_1_ChangeColor) {
+    Command_Video_1_ChangeColor();
+  } else if (ProgramStatus == Command_Video_2_ChangeColor) {
+    Command_Video_2_ChangeColor();
+  } else if (ProgramStatus == Command_Video_3_ChangeColor) {
+    Command_Video_3_ChangeColor();
   }
 }
 
@@ -176,19 +171,19 @@ void VideoChooseScene() {
     if (HandX < LRedge+FrontCover1Width) {
       CommandSend(Command_Video_1_Play);
       Movie1.play();
-      ProgramStatus = Video_1_PlayScene;
+      ProgramStatus = Command_Video_1_Play;
       //play movie1
       return;
     } else if ( HandX > FrontCover2X-FrontCover2Width/2 && HandX < FrontCover2X+FrontCover2Width/2) {
       CommandSend(Command_Video_2_Play);
       Movie2.play();
-      ProgramStatus = Video_2_PlayScene;
+      ProgramStatus = Command_Video_2_Play;
       //play movie2
       return;
     } else if ( HandX > FrontCover3X-FrontCover3Width/2) {
       CommandSend(Command_Video_3_Play);
       Movie3.play();
-      ProgramStatus = Video_3_PlayScene;
+      ProgramStatus = Command_Video_3_Play;
       //play movie3
       return;
     }
@@ -209,61 +204,77 @@ void VideoChooseScene() {
   }
 }
 
-void Video_1_PlayScene() {
-  CommandSend(Command_Video_1_Play);
+void Command_Video_1_Play() {
+  if (ProgramStatus!=Command_Video_1_Play && ProgramStatus!=Command_Video_1_ChangeColor) {
+    CommandSend(Command_Video_1_Play);
+    ProgramStatus = Command_Video_1_Play;
+  }
   //image(Movie1, width/2, height/2, width, height);
   image(Movie1, width/2, height/2);//无缩放居中播放
-  ProgramStatus = Video_1_PlayScene;
   if (ControlCmdCheck() == HandShapStone) {
-    ProgramStatus = Video_1_ColorChangeScene;
+    CommandSend(Command_Video_1_ChangeColor);
+    ProgramStatus = Command_Video_1_ChangeColor;
   }
   //播放视频1
 }
 
-void Video_2_PlayScene() {
-  CommandSend(Command_Video_2_Play);
+void Command_Video_2_Play() {
+  if (ProgramStatus!=Command_Video_2_Play && ProgramStatus!=Command_Video_2_ChangeColor) {
+    CommandSend(Command_Video_2_Play);
+    ProgramStatus = Command_Video_2_Play;
+  }
   //image(Movie2, width/2, height/2, width, height);
   image(Movie2, width/2, height/2);//无缩放居中播放
-  ProgramStatus = Video_2_PlayScene;
-  if (ControlCmdCheck() == HandShapStone) {
-    ProgramStatus = Video_2_ColorChangeScene;
+  //ProgramStatus = Command_Video_2_Play;
+  if (ControlCmdCheck() == HandShapSword) {
+    CommandSend(Command_Video_2_ChangeColor);
+    ProgramStatus = Command_Video_2_ChangeColor;
   }
   //播放视频2
 }
 
-void Video_3_PlayScene() {
-  CommandSend(Command_Video_2_Play);
+void Command_Video_3_Play() {
+  if (ProgramStatus!=Command_Video_3_Play && ProgramStatus!=Command_Video_3_ChangeColor) {
+    CommandSend(Command_Video_3_Play);
+    ProgramStatus = Command_Video_3_Play;
+  }
   //image(Movie3, width/2, height/2, width, height);
   image(Movie3, width/2, height/2);//无缩放居中播放
-  ProgramStatus = Video_3_PlayScene;
-  if (ControlCmdCheck() == HandShapStone) {
-    ProgramStatus = Video_3_ColorChangeScene;
+  //ProgramStatus = Command_Video_3_Play;
+  if (ControlCmdCheck() == HandShapBye) {
+    CommandSend(Command_Video_3_ChangeColor);
+    ProgramStatus = Command_Video_3_ChangeColor;
   }
   //播放视频3
 }
 
-void Video_1_ColorChangeScene() {
+void Command_Video_1_ChangeColor() {
   CommandSend(Command_Video_1_ChangeColor);
-  Video_1_PlayScene();
+  ProgramStatus = Command_Video_1_ChangeColor;
+  Command_Video_1_Play();
   //后面写发送信息要求客户端播放视频1换色指令
 }
 
-void Video_2_ColorChangeScene() {
+void Command_Video_2_ChangeColor() {
   CommandSend(Command_Video_2_ChangeColor);
-  Video_2_PlayScene();
+  ProgramStatus = Command_Video_2_ChangeColor;
+  Command_Video_2_Play();
   //后面写发送信息要求客户端播放视频2换色指令
 }
 
-void Video_3_ColorChangeScene() {
-  CommandSend(Command_Video_2_ChangeColor);
-  Video_3_PlayScene();
+void Command_Video_3_ChangeColor() {
+  CommandSend(Command_Video_3_ChangeColor);
+  ProgramStatus = Command_Video_3_ChangeColor;
+  Command_Video_3_Play();
   //后面写发送信息要求客户端播放视频3换色指令
 }
 
 void CommandSend(int CommandStateMant) {
-  myClient.clear();
-  myClient.write(CommandStateMant);
-  println("Net sent: ", CommandStateMant);
+  if (ProgramStatus != CommandStateMant) {
+    myClient.clear();
+    myClient.write(CommandStateMant);
+    println("Net sent: ", CommandStateMant);
+  }
   //向客户端发送相应指令
 }
 
