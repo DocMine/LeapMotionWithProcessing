@@ -1,4 +1,4 @@
-import de.voidplus.leapmotion.*; //<>// //<>// //<>//
+import de.voidplus.leapmotion.*;  //<>//
 import processing.video.*;
 import processing.net.*;
 import de.voidplus.leapmotion.*;
