@@ -1,4 +1,4 @@
-import de.voidplus.leapmotion.*; //<>// //<>//
+import de.voidplus.leapmotion.*; //<>// //<>// //<>//
 import processing.video.*;
 import processing.net.*;
 import de.voidplus.leapmotion.*;
@@ -58,9 +58,9 @@ void setup() {
   Movie3 = new Movie(this, sketchPath("")+"/Movie3.mov"); 
   //three Movie we need
   leap = new LeapMotion(this);
-  size(1280, 960);
+  //size(1280, 960);
   //set Window Size
-  //fullscreen();
+  fullScreen();
   noStroke();
   //Disables drawing the stroke (outline). 
   //If both noStroke() and noFill() are called, 
@@ -82,7 +82,6 @@ void draw() {
   if (ControlCmdCheck() == HandShapBack)ProgramStatus = VideoChooseScene;
   //一下代码制定了程序可能出现的7种情况，根据操作检测环节的返回值来确定该如何刷新界面
   if (ProgramStatus == VideoChooseScene) {
-    println("VideoChooseScene");
     VideoChooseScene();
   } else if (ProgramStatus == Video_1_PlayScene) {
     Video_1_PlayScene();
@@ -156,7 +155,7 @@ void VideoChooseScene() {
   //Frash Img Location
   int LRedge = width/25;
   //Frash Img size
-  int FrontCoverMinWidth = width / 8;
+  int FrontCoverMinWidth = width / 16;
   int FrontCoverMaxWidth = width / 3;
   int FrontCover1X = LRedge+FrontCoverMaxWidth/2;
   int FrontCover1Y = height/2;
@@ -174,19 +173,19 @@ void VideoChooseScene() {
 
   //Play Movie1 or Movie2 or Movie3
   if (ControlCmdCheck() == HandShapOK) {//如果用户选择播放
-    if (HandX > FrontCover1X && HandX < FrontCover1X+FrontCover1Width) {
+    if (HandX < LRedge+FrontCover1Width) {
       CommandSend(Command_Video_1_Play);
       Movie1.play();
       ProgramStatus = Video_1_PlayScene;
       //play movie1
       return;
-    } else if ( HandX > FrontCover2X && HandX <FrontCover2X+FrontCover2Width) {
+    } else if ( HandX > FrontCover2X-FrontCover2Width/2 && HandX < FrontCover2X+FrontCover2Width/2) {
       CommandSend(Command_Video_2_Play);
       Movie2.play();
       ProgramStatus = Video_2_PlayScene;
       //play movie2
       return;
-    } else if ( HandX > FrontCover3X && HandX <FrontCover3X+FrontCover3Width) {
+    } else if ( HandX > FrontCover3X-FrontCover3Width/2) {
       CommandSend(Command_Video_3_Play);
       Movie3.play();
       ProgramStatus = Video_3_PlayScene;
