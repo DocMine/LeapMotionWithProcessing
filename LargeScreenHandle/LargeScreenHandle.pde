@@ -29,7 +29,7 @@ PImage FrontCover1, FrontCover2, FrontCover3;
 Movie MovieShap1, MovieShap2, MovieShap3;
 //three Movie we need
 
-int CommandReceived = 0;
+int CommandReceived = 8;
 boolean myServerRunning = true;
 int MovieBeenPointed = 0;
 int Is_Playing = 0;
@@ -40,7 +40,7 @@ void setup() {
   imageMode(CENTER);
   myServer = new Server(this, ServerPort);
   // Starts a myServer on port 10002
-  size(640, 480);
+  size(1920, 1080);
   //set Window Size
   //fullScreen();
   noStroke();
@@ -76,7 +76,6 @@ void draw() {
   //image(MovieShap3, width/2, height/2, width, height);
     Client thisClient = myServer.available();
     //获取链接进来的client
-    if(thisClient != null)println("got");
     if (thisClient != null && thisClient.available() > 0) {
       CommandReceived= thisClient.read();
       println("received: ", CommandReceived);
@@ -109,38 +108,50 @@ void draw() {
 
 void Video_1_Cover(){
   //封面1
+  MovieShap1.stop();
   set(0, 0, FrontCover1);
 }
 void Video_2_Cover(){
   //封面2
+  MovieShap2.stop();
   set(0, 0, FrontCover2);
 }
 void Video_3_Cover(){
   //封面3
+  MovieShap3.stop();
   set(0, 0, FrontCover3);
 }
 void Video_1_Play(){
   //播放视频1
+   if(!MovieShap1.isPlaying())MovieShap1.play();
   image(MovieShap1, width/2, height/2, width, height);
 }
 void Video_2_Play(){
   //播放视频2
+   if(!MovieShap2.isPlaying())MovieShap2.play();
   image(MovieShap2, width/2, height/2, width, height);
 }
 void Video_3_Play(){
   //播放视频3
+  if(!MovieShap3.isPlaying())MovieShap3.play();
   image(MovieShap3, width/2, height/2, width, height);
 }
 void Video_1_ColorChangeScene(){
-  ColorChange(MovieShap1, color(0, 0, 0), color(255, 0, 0), 50);
+  if(!MovieShap1.isPlaying())MovieShap1.play();
+  background(0);
+  ColorChange(MovieShap1, color(255, 255, 255), color(255, 0, 0), 50);
   //播放处理过的视频1(白色替换为蓝色)
 }
 void Video_2_ColorChangeScene(){
-  ColorChange(MovieShap2, color(0, 0, 0), color(0, 255, 0), 50);
+  if(!MovieShap2.isPlaying())MovieShap2.play();
+  background(0);
+  ColorChange(MovieShap2, color(255,255, 255), color(0, 255, 0), 50);
   //播放处理过的视频2(白色替换为红色)
 }
 void Video_3_ColorChangeScene(){
-  ColorChange(MovieShap3, color(0, 0, 0), color(0, 0, 255), 50);
+  if(!MovieShap3.isPlaying())MovieShap3.play();
+  background(0);
+  ColorChange(MovieShap3, color(255, 255, 255), color(0, 0, 255), 50);
   //播放处理过的视频3(白色替换为绿色)
 }
 
@@ -148,15 +159,15 @@ void PlayChoosenMovie() {
   //Play MovieShap1 or MovieShap2 or MovieShap3
   if (MovieBeenPointed == PLAYING_MOVIE1) {
     Is_Playing=PLAYING_MOVIE1;
-    MovieShap1.play();
+    MovieShap1.loop();
     //play movie1
   } else if (MovieBeenPointed == PLAYING_MOVIE2) {
     Is_Playing=PLAYING_MOVIE2;
-    MovieShap2.play();
+    MovieShap2.loop();
     //play movie2
   } else if (MovieBeenPointed == PLAYING_MOVIE3) {
     Is_Playing=PLAYING_MOVIE3;
-    MovieShap3.play();
+    MovieShap3.loop();
     //play movie3
   }
 }
