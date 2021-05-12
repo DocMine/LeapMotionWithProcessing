@@ -9,7 +9,7 @@ LeapMotion leap;
 //Init leapMotion Device
 
 //String ServerIP = "127.0.0.1";
-String ServerIP = "192.168.10.105";
+String ServerIP = "192.168.1.111";
 int ServerPort = 10002;
 Client myClient = new Client(this, ServerIP, ServerPort);
 //Init Socket services
@@ -37,7 +37,7 @@ public static int HandShapBye = 4;
 
 int HandXLocationMin = 200;
 int HandXLocationMax = 1500;
-PImage FrontCover1, FrontCover2, FrontCover3;
+PImage FrontCover1, FrontCover2, FrontCover3, BackGroundimg;
 Movie Movie1, Movie2, Movie3, BackGround1;
 
 
@@ -46,6 +46,7 @@ void setup() {
   FrontCover1 = loadImage(sketchPath("")+"Cover1.jpg");
   FrontCover2 = loadImage(sketchPath("")+"Cover2.jpg");  
   FrontCover3 = loadImage(sketchPath("")+"Cover3.jpg");  
+  BackGroundimg = loadImage(sketchPath("")+"Background.jpg"); 
   // Load the image into the program
   // The image file must be in the data folder of the current sketch to load successfully
   Movie1 = new Movie(this, sketchPath("")+"/Movie1.mov");
@@ -53,9 +54,9 @@ void setup() {
   Movie3 = new Movie(this, sketchPath("")+"/Movie3.mov"); 
   //three Movie we need
   leap = new LeapMotion(this);
-  size(1280, 960);
+  //size(1280, 960);
   //set Window Size
-  //fullScreen();
+  fullScreen();
   noStroke();
   //Disables drawing the stroke (outline). 
   //If both noStroke() and noFill() are called, 
@@ -95,8 +96,8 @@ void draw() {
 
 void BackGroundScene() {
   //这里刷新和显示背景的变化，其他内容都在此基础上刷新和显示
-  //image(FrontCover1, width/2, height/2);
-  background(100, 25, 25);
+  image(BackGroundimg, width/2, height/2);
+  //background(100, 25, 25);
 }
 
 int ControlCmdCheck() {

@@ -24,7 +24,7 @@ public static int Command_Video_1_ChangeColor = 7;
 public static int Command_Video_2_ChangeColor = 8;
 public static int Command_Video_3_ChangeColor = 9;
 
-PImage FrontCover1, FrontCover2, FrontCover3;  
+PImage FrontCover1, FrontCover2, FrontCover3, BackGround;  
 // Declare 3 variable of type PImage
 Movie MovieShap1, MovieShap2, MovieShap3;
 //three Movie we need
@@ -40,12 +40,13 @@ void setup() {
   imageMode(CENTER);
   myServer = new Server(this, ServerPort);
   // Starts a myServer on port 10002
-  size(1920, 1080);
+  //size(1920, 1080);
   //set Window Size
-  //fullScreen();
+  fullScreen();
   noStroke();
   //所绘制的图形都没有描边
   //加载图像和视频并准备
+  BackGround = loadImage(sketchPath("")+"Background.jpg");
   FrontCover1 = loadImage(sketchPath("")+"ShapeCover1.jpg");
   FrontCover2 = loadImage(sketchPath("")+"ShapeCover2.jpg");  
   FrontCover3 = loadImage(sketchPath("")+"ShapeCover3.jpg");  
@@ -85,6 +86,7 @@ void draw() {
       CommandReceived= thisClient.read();
     }
     //对于每个连入的客户端，获取读取到的数据
+    image(BackGround, width/2, height/2);
     if (CommandReceived == Command_Video_1_Cover) {
     Video_1_Cover();
   } else if (CommandReceived == Command_Video_2_Cover) {
