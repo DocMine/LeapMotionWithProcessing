@@ -9,7 +9,7 @@ LeapMotion leap;
 //Init leapMotion Device
 
 //String ServerIP = "127.0.0.1";
-String ServerIP = "192.168.1.111";
+String ServerIP = "192.168.10.105";
 int ServerPort = 10002;
 Client myClient = new Client(this, ServerIP, ServerPort);
 //Init Socket services
